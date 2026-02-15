@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$ClawGrab - The Sketchbook Hunter</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Caveat:wght@400;700&family=Indie+Flower&display=swap" rel="stylesheet">
+    <!-- FontAwesome (we will style these to look sketched if possible, or use them as stamps) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-paper: #F5F0E6;
+            --pencil-gray: #2C2C2C;
+            --marker-red: #FF6B4A;
+            --highlighter-gold: #FFD700;
+            --pencil-shade: #A5A5A5;
+            --text-dark: #1A1A1A;
+            
+            --font-heading: 'Caveat', cursive;
+            --font-body: 'Indie Flower', cursive;
+            --font-stats: 'Architects Daughter', cursive;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-paper);
+            color: var(--text-dark);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            position: relative;
+            /* Dot Grid Texture (Bullet Journal style) */
+            background-image: radial-gradient(var(--pencil-shade) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Paper Texture Overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.6;
+        }
+
+        /* Hand-Drawn Classes */
+        .hand-drawn-border {
+            border: 2px solid var(--pencil-gray);
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            background: white;
+            box-shadow: 2px 3px 0px var(--pencil-shade);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .hand-drawn-border:hover {
+            transform: scale(1.01) rotate(-1deg);
+            box-shadow: 3px 5px 0px var(--pencil-gray);
+        }
+
+        .highlight-gold {
+            background: linear-gradient(120deg, rgba(255, 215, 0, 0) 0%, rgba(255, 215, 0, 0.6) 10%, rgba(255, 215, 0, 0.2) 80%, rgba(255, 215, 0, 0) 100%);
+            padding: 0 5px;
+            border-radius: 5px;
+        }
+
+        .highlight-red {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .highlight-red::after {
+            content: '';
+            position: absolute;
+            left: -5%;
+            bottom: 5px;
+            width: 110%;
+            height: 8px;
+            background: var(--marker-red);
+            opacity: 0.4;
+            transform: skewX(-20deg) rotate(-2deg);
+            z-index: -1;
+            border-radius: 20px;
+        }
+
+        /* Layout Utilities */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            padding: 60px 0;
+            position: relative;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-family: var(--font-heading);
+            color: var(--pencil-gray);
+            font-weight: 700;
+        }
+
+        h1 { font-size: 4.5rem; line-height: 0.9; transform: rotate(-2deg); }
+        h2 { font-size: 3rem; margin-bottom: 30px; transform: rotate(1deg); display: inline-block; }
+        
+        p {
+            font-size: 1.4rem;
+            line-height: 1.5;
+            color: var(--text-dark);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            text-decoration: none;
+            color: var(--pencil-gray);
+            border: 3px solid var(--pencil-gray);
+            background: #fff;
+            /* Wobbly border radius */
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .btn-primary {
+            background-color: var(--marker-red);
+            color: white;
+            border-color: var(--pencil-gray);
+            box-shadow: 4px 4px 0 var(--pencil-gray);
+        }
+
+        .btn-primary:hover {
+            transform: translate(-2px, -2px) rotate(1deg);
+            box-shadow: 6px 6px 0 var(--pencil-gray);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border-style: dashed;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(0,0,0,0.05);
+            transform: rotate(-2deg);
+        }
+
+        /* Header */
+        header {
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            background-color: rgba(245, 240, 230, 0.95);
+            z-index: 100;
+            border-bottom: 2px dashed var(--pencil-gray);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 2.5rem;
+            font-family: var(--font-heading);
+            color: var(--marker-red);
+            text-decoration: none;
+            transform: rotate(-3deg);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--pencil-gray);
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            position: relative;
+        }
+
+        nav a:hover::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 100%;
+            height: 3px;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='5' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 2.5 Q 5 0, 10 2.5 T 20 2.5 T 30 2.5 T 40 2.5' stroke='%23FF6B4A' fill='none' stroke-width='2'/%3E%3C/svg%3E");
+            background-size: 20px 5px;
+            animation: squiggle 0.5s linear infinite;
+        }
+
+        @keyframes squiggle {
+            from { background-position: 0 0; }
+            to { background-position: 20px 0; }
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px) rotate(5deg); }
+            to { opacity: 1; transform: translateY(0) rotate(var(--rotation)); }
+        }
+
+        .wallet-btn {
+            background: #fff;
+            border: 3px solid var(--pencil-gray);
+            color: var(--pencil-gray);
+            padding: 10px 20px;
+            font-family: var(--font-stats);
+            font-weight: bold;
+            font-size: 1.2rem;
+            /* Uneven rectangle */
+            border-radius: 10px 4px 12px 6px;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 var(--highlighter-gold);
+            transition: transform 0.2s;
+        }
+
+        .wallet-btn:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 80vh;
+        }
+
+        .hero-text {
+            flex: 1;
+            padding-right: 40px;
+        }
+
+        .hero h1 span {
+            color: var(--marker-red);
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: var(--pencil-gray);
+        }
+
+        .hero p {
+            margin-bottom: 40px;
+            transform: rotate(1deg);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Hand-Drawn Crab SVG */
+        #sketch-crab {
+            width: 450px;
+            overflow: visible;
+        }
+
+        .crab-lines {
+            fill: none;
+            stroke: var(--pencil-gray);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .crab-fill {
+            fill: var(--marker-red);
+            opacity: 0.1; /* Sketchy fill */
+        }
+
+        .crab-shading {
+            stroke: var(--pencil-gray);
+            stroke-width: 1;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            padding: 20px;
+        }
+
+        .stat-item {
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid var(--pencil-gray);
+            border-radius: 5px 25px 5px 25px;
+            box-shadow: 5px 5px 0 var(--pencil-shade);
+            position: relative;
+        }
+        
+        /* Tape effect */
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 60px;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-left: 1px dashed rgba(0,0,0,0.1);
+            border-right: 1px dashed rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .stat-value {
+            font-family: var(--font-stats);
+            font-size: 2.8rem;
+            color: var(--marker-red);
+            display: block;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            color: var(--pencil-gray);
+        }
+
+        /* Drops Section */
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-header h2 {
+            position: relative;
+            padding: 0 20px;
+        }
+        
+        .section-header h2::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 10px;
+            background: var(--highlighter-gold);
+            opacity: 0.5;
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            z-index: -1;
+            transform: rotate(-1deg);
+            border-radius: 5px;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .filter-btn {
+            background: none;
+            border: 2px solid var(--pencil-gray);
+            font-family: var(--font-stats);
+            font-size: 1.2rem;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 20px 5px 20px 5px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--pencil-gray);
+            color: #fff;
+            border-radius: 5px 20px 5px 20px;
+            transform: rotate(-2deg);
+        }
+
+        .drops-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .drop-card {
+            background: #fff;
+            padding: 25px;
+            border: 2px solid var(--pencil-gray);
+            /* Looks like a sticky note or index card */
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
+            transform: rotate(var(--rotation));
+            transition: transform 0.3s;
+            position: relative;
+        }
+        
+        /* Pin */
+        .drop-card::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--marker-red);
+            border: 2px solid var(--pencil-gray);
+            box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+        }
+
+        .drop-card:hover {
+            transform: scale(1.05) rotate(0deg) !important;
+            z-index: 10;
+        }
+
+        .drop-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 2px dashed var(--pencil-shade);
+            padding-bottom: 10px;
+        }
+
+        .network-icon {
+            font-size: 1.5rem;
+            color: var(--pencil-gray);
+        }
+
+        .project-name {
+            font-size: 1.8rem;
+            font-family: var(--font-heading);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .status-active {
+            color: green; /* Drawn green */
+            font-weight: bold;
+            font-family: var(--font-heading);
+            transform: rotate(-2deg);
+            display: inline-block;
+        }
+
+        .difficulty-dots {
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .btn-card {
+            width: 100%;
+            margin-top: 15px;
+            background: var(--highlighter-gold);
+            border: 2px solid var(--pencil-gray);
+            color: var(--text-dark);
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px 15px 5px 15px;
+            transition: all 0.2s;
+        }
+
+        .btn-card:hover {
+            background: #fff;
+            box-shadow: inset 0 0 10px var(--highlighter-gold);
+        }
+
+        /* My Crab Section */
+        .my-crab-section {
+            background: #fff;
+            border: 3px solid var(--pencil-gray);
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            box-shadow: 10px 10px 0 var(--pencil-shade);
+            margin-top: 60px;
+        }
+
+        /* Coffee Stain */
+        .coffee-stain {
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 150px;
+            height: 150px;
+            border: 15px solid rgba(139, 69, 19, 0.1);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+            filter: blur(2px);
+            transform: scale(1, 0.9);
+        }
+
+        .my-crab-container {
+            display: flex;
+            gap: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-bar {
+            height: 25px;
+            border: 3px solid var(--pencil-gray);
+            border-radius: 15px;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--marker-red),
+                var(--marker-red) 10px,
+                #fff 10px,
+                #fff 20px
+            );
+            width: 30%;
+            border-right: 3px solid var(--pencil-gray);
+        }
+
+        .stat-box {
+            border: 2px solid var(--pencil-gray);
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+            background: var(--bg-paper);
+            transform: rotate(var(--rot));
+        }
+
+        /* Token Image */
+        .token-img-container {
+            width: 100%;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .token-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border: 3px solid var(--pencil-gray);
+            border-radius: 15px 5px 15px 5px;
+            background: #fff;
+            transform: rotate(-2deg);
+            box-shadow: 3px 3px 0 var(--pencil-shade);
+            transition: transform 0.2s;
+        }
+        
+        .token-img:hover {
+            transform: scale(1.1) rotate(0deg);
+        }
+
+        .token-placeholder {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed var(--pencil-gray);
+            border-radius: 15px 5px 15px 5px;
+            font-size: 2rem;
+            color: var(--pencil-shade);
+            transform: rotate(2deg);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 100px;
+            padding: 60px 0;
+            text-align: center;
+            border-top: 3px solid var(--pencil-gray);
+            background: #fff;
+        }
+
+        .social-icon {
+            font-size: 2rem;
+            color: var(--pencil-gray);
+            margin: 0 15px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .social-icon:hover {
+            color: var(--marker-red);
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #fff;
+            border: 3px solid var(--pencil-gray);
+            color: var(--text-dark);
+            padding: 20px 40px;
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            box-shadow: 10px 10px 0 var(--pencil-shade);
+            transform: translateY(150%) rotate(-5deg);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0) rotate(-5deg);
+        }
+
+        /* Animations */
+        @keyframes handWiggle {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-2deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .wiggle-hover:hover {
+            animation: handWiggle 0.3s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero { flex-direction: column-reverse; text-align: center; padding-top: 40px; }
+            .hero-text { padding-right: 0; }
+            .drops-grid, .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; gap: 20px; }
+            .drops-grid, .stats-grid { grid-template-columns: 1fr; }
+            .my-crab-container { flex-direction: column; }
+            h1 { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-crab" style="transform: rotate(-10deg);"></i>
+                <span>CLAWGRAB</span>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#hunt">Hunt</a></li>
+                    <li><a href="#my-crab">My Crab</a></li>
+                    <li><a href="#leaderboard">Leaderboard</a></li>
+                </ul>
+            </nav>
+            <button class="wallet-btn">
+                Connect Wallet
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero container">
+        <div class="hero-text">
+            <h1>Grab Drops <br><span class="highlight-red">Faster Than Everyone</span></h1>
+            <p style="font-size: 1.6rem; margin-top: 20px;">$ClawGrab — the airdrop hunter across 20+ networks. Your crab works while you sleep.</p>
+            <div class="hero-buttons">
+                <a href="#hunt" class="btn btn-primary">Start Hunting</a>
+                <a href="#" class="btn btn-secondary">Buy Token</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <!-- Hand-Drawn Crab SVG -->
+            <svg id="sketch-crab" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- Pencil Texture Filter -->
+                    <filter id="pencil">
+                        <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise"/>
+                        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+                    </filter>
+                </defs>
+                
+                <g filter="url(#pencil)">
+                    <!-- Legs Left (Wobbly lines) -->
+                    <path d="M80 120 Q 50 140 30 130" class="crab-lines" />
+                    <path d="M85 110 Q 50 120 25 110" class="crab-lines" />
+                    <path d="M90 100 Q 55 100 30 90" class="crab-lines" />
+                    
+                    <!-- Legs Right -->
+                    <path d="M220 120 Q 250 140 270 130" class="crab-lines" />
+                    <path d="M215 110 Q 250 120 275 110" class="crab-lines" />
+                    <path d="M210 100 Q 245 100 270 90" class="crab-lines" />
+
+                    <!-- Claws (Asymmetrical) -->
+                    <!-- Left Claw (Small) -->
+                    <g class="claw-anim-left" style="transform-origin: 80px 80px;">
+                        <path d="M80 90 Q 60 60 70 40 L 50 30 L 60 60 Z" class="crab-lines crab-fill" />
+                        <path d="M70 40 L 85 25" class="crab-lines" /> <!-- Pincher -->
+                    </g>
+
+                    <!-- Right Claw (Big) -->
+                    <g class="claw-anim-right" style="transform-origin: 220px 80px;">
+                        <path d="M220 90 Q 240 50 220 30 L 250 10 L 260 50 Z" class="crab-lines crab-fill" />
+                        <path d="M220 30 L 200 10" class="crab-lines" /> <!-- Pincher -->
+                    </g>
+
+                    <!-- Body (Imperfect Oval) -->
+                    <ellipse cx="150" cy="110" rx="75" ry="50" class="crab-lines crab-fill" style="stroke-dasharray: 5,2;" />
+                    
+                    <!-- Cross Hatching Shading on Body -->
+                    <path d="M120 120 L 130 130 M130 120 L 140 130 M140 120 L 150 130" class="crab-shading" />
+
+                    <!-- Eyes (Googly) -->
+                    <g class="eye-anim">
+                        <!-- Left Eye -->
+                        <path d="M120 70 L 120 50" class="crab-lines" />
+                        <circle cx="120" cy="45" r="12" fill="#fff" stroke="#2C2C2C" stroke-width="2" />
+                        <circle cx="122" cy="45" r="4" fill="#2C2C2C" />
+
+                        <!-- Right Eye (Higher) -->
+                        <path d="M180 70 L 180 40" class="crab-lines" />
+                        <circle cx="180" cy="35" r="14" fill="#fff" stroke="#2C2C2C" stroke-width="2" />
+                        <circle cx="178" cy="35" r="5" fill="#2C2C2C" />
+                    </g>
+                    
+                    <!-- Mouth -->
+                    <path d="M140 130 Q 150 140 160 130" class="crab-lines" stroke-width="2" />
+                </g>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Live PumpFun Feed Section -->
+    <section id="live-feed" class="section container">
+        <div class="section-header">
+            <h2>Live PumpFun Feed <span class="status-active" style="font-size: 0.6em; vertical-align: middle; animation: blink 1s infinite;">● LIVE</span></h2>
+            <p>Fresh tokens straight from the blockchain oven!</p>
+        </div>
+        
+        <div id="pump-feed-grid" class="drops-grid">
+            <!-- Loading State -->
+            <div class="drop-card" style="grid-column: 1/-1; text-align: center; border-style: dashed;">
+                <h3>Connecting to PumpFun...</h3>
+                <i class="fa-solid fa-satellite-dish fa-spin" style="font-size: 3rem; margin: 20px; color: var(--marker-red);"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics -->
+    <section class="container">
+        <div class="stats-grid">
+            <div class="stat-item" style="transform: rotate(-1deg);">
+                <span class="stat-value" data-target="24">0</span>
+                <span class="stat-label">Active Drops</span>
+            </div>
+            <div class="stat-item" style="transform: rotate(2deg);">
+                <span class="stat-value" data-target="1234">0</span>
+                <span class="stat-label">Caught Today</span>
+            </div>
+            <div class="stat-item" style="transform: rotate(-1.5deg);">
+                <span class="stat-value" data-target="3456">0</span>
+                <span class="stat-label">Online Crabs</span>
+            </div>
+            <div class="stat-item" style="transform: rotate(1deg);">
+                <span class="stat-value" data-target="12345">$0</span>
+                <span class="stat-label">Biggest Drop</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Active Drops -->
+    <section id="hunt" class="section container">
+        <div class="section-header">
+            <h2>Active Drops</h2>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All Sketches</button>
+                <button class="filter-btn" data-filter="eth">ETH</button>
+                <button class="filter-btn" data-filter="sol">SOL</button>
+                <button class="filter-btn" data-filter="ton">TON</button>
+            </div>
+        </div>
+
+        <div class="drops-grid">
+            <!-- Card 1 -->
+            <div class="drop-card" data-network="eth" style="--rotation: -2deg;">
+                <div class="drop-header">
+                    <i class="fa-brands fa-ethereum network-icon"></i>
+                    <span class="project-name">EtherSea</span>
+                </div>
+                <div class="detail-row">
+                    <span>Status:</span>
+                    <span class="status-active">ACTIVE</span>
+                </div>
+                <div class="detail-row">
+                    <span>Pool:</span>
+                    <span class="highlight-gold">$50,000</span>
+                </div>
+                <div class="detail-row">
+                    <span>Difficulty:</span>
+                    <span class="difficulty-dots">●●●○○</span>
+                </div>
+                <button class="btn-card" onclick="deployCrab(this)">DEPLOY CRAB</button>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="drop-card" data-network="sol" style="--rotation: 1.5deg;">
+                <div class="drop-header">
+                    <i class="fa-solid fa-bolt network-icon"></i>
+                    <span class="project-name">SolReef</span>
+                </div>
+                <div class="detail-row">
+                    <span>Status:</span>
+                    <span class="status-active">ACTIVE</span>
+                </div>
+                <div class="detail-row">
+                    <span>Pool:</span>
+                    <span class="highlight-gold">$12,000</span>
+                </div>
+                <div class="detail-row">
+                    <span>Difficulty:</span>
+                    <span class="difficulty-dots">●●○○○</span>
+                </div>
+                <button class="btn-card" onclick="deployCrab(this)">DEPLOY CRAB</button>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="drop-card" data-network="ton" style="--rotation: -1deg;">
+                <div class="drop-header">
+                    <i class="fa-regular fa-paper-plane network-icon"></i>
+                    <span class="project-name">TonTrench</span>
+                </div>
+                <div class="detail-row">
+                    <span>Status:</span>
+                    <span class="status-active">ACTIVE</span>
+                </div>
+                <div class="detail-row">
+                    <span>Pool:</span>
+                    <span class="highlight-gold">$25,000</span>
+                </div>
+                <div class="detail-row">
+                    <span>Difficulty:</span>
+                    <span class="difficulty-dots">●●●●○</span>
+                </div>
+                <button class="btn-card" onclick="deployCrab(this)">DEPLOY CRAB</button>
+            </div>
+            
+             <!-- Card 4 -->
+             <div class="drop-card" data-network="eth" style="--rotation: 2deg;">
+                <div class="drop-header">
+                    <i class="fa-brands fa-ethereum network-icon"></i>
+                    <span class="project-name">DeepDive</span>
+                </div>
+                <div class="detail-row">
+                    <span>Status:</span>
+                    <span class="status-active">ACTIVE</span>
+                </div>
+                <div class="detail-row">
+                    <span>Pool:</span>
+                    <span class="highlight-gold">$7,500</span>
+                </div>
+                <div class="detail-row">
+                    <span>Difficulty:</span>
+                    <span class="difficulty-dots">●○○○○</span>
+                </div>
+                <button class="btn-card" onclick="deployCrab(this)">DEPLOY CRAB</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- My Crab -->
+    <section id="my-crab" class="container">
+        <div class="my-crab-section">
+            <div class="coffee-stain"></div>
+            <h2 style="position: relative; z-index: 1;">Your Crab <span style="font-size: 1.5rem; color: var(--pencil-shade);">(Character Sheet)</span></h2>
+            
+            <div class="my-crab-container">
+                <div style="flex: 1; text-align: center;">
+                    <!-- Another sketched crab icon -->
+                    <i class="fa-solid fa-crab wiggle-hover" style="font-size: 8rem; color: var(--marker-red); opacity: 0.8; transform: rotate(-5deg);"></i>
+                    <p style="font-family: var(--font-heading); font-size: 2rem; margin-top: 10px;">Sir Pinch-a-Lot</p>
+                </div>
+                <div style="flex: 2;">
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; font-family: var(--font-stats); font-weight: bold;">
+                            <span>LEVEL 7</span>
+                            <span>XP: 1,234 / 5,000</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 20px;">
+                        <div class="stat-box" style="--rot: -2deg; flex: 1;">
+                            <h4>CLAWS</h4>
+                            <p class="stat-value" style="font-size: 2rem;">Lv.3</p>
+                        </div>
+                        <div class="stat-box" style="--rot: 2deg; flex: 1;">
+                            <h4>SHELL</h4>
+                            <p class="stat-value" style="font-size: 2rem;">Lv.2</p>
+                        </div>
+                        <div class="stat-box" style="--rot: -1deg; flex: 1;">
+                            <h4>EYES</h4>
+                            <p class="stat-value" style="font-size: 2rem;">Lv.1</p>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="margin-top: 30px; width: 100%;">Upgrade Crab</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="container">
+        <div class="social-links">
+            <a href="#" class="social-icon"><i class="fa-brands fa-twitter"></i></a>
+            <a href="#" class="social-icon"><i class="fa-brands fa-telegram"></i></a>
+            <a href="#" class="social-icon"><i class="fa-brands fa-discord"></i></a>
+        </div>
+        <p style="font-family: var(--font-stats); margin-top: 20px;">CA: 0x1234...ABCD (Written on napkin)</p>
+        <p style="font-size: 1rem; color: var(--pencil-shade); margin-top: 10px;">&copy; 2024 ClawGrab. Not financial advice, just a drawing.</p>
+    </footer>
+
+    <!-- Toast -->
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-check" style="color: green;"></i>
+        <span>Deployed! Good hunting!</span>
+    </div>
+
+    <script>
+        // Stats Animation
+        const counters = document.querySelectorAll('.stat-value');
+        counters.forEach(counter => {
+            const target = +counter.getAttribute('data-target');
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            
+            let current = 0;
+            const updateCounter = () => {
+                current += increment;
+                if(current < target) {
+                    if(counter.innerText.includes('$')) {
+                        counter.innerText = '$' + Math.ceil(current).toLocaleString();
+                    } else {
+                        counter.innerText = Math.ceil(current).toLocaleString();
+                    }
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    if(counter.innerText.includes('$')) {
+                         counter.innerText = '$' + target.toLocaleString();
+                    } else {
+                        counter.innerText = target.toLocaleString();
+                    }
+                }
+            };
+            updateCounter();
+        });
+
+        // Crab Animation (CSS + JS for extra randomness)
+        const crab = document.getElementById('sketch-crab');
+        const leftClaw = document.querySelector('.claw-anim-left');
+        const rightClaw = document.querySelector('.claw-anim-right');
+        const eyes = document.querySelector('.eye-anim');
+
+        // Random idle animations
+        setInterval(() => {
+            // Random twitch
+            if(Math.random() > 0.7) {
+                leftClaw.style.transform = `rotate(${Math.random() * 20 - 10}deg)`;
+            }
+            if(Math.random() > 0.7) {
+                rightClaw.style.transform = `rotate(${Math.random() * 20 - 10}deg)`;
+            }
+            if(Math.random() > 0.5) {
+                eyes.style.transform = `translateY(${Math.random() * 5}px)`;
+            }
+        }, 500);
+
+        // Filter Logic
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const drops = document.querySelectorAll('.drop-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const filter = btn.getAttribute('data-filter');
+                drops.forEach(drop => {
+                    if (filter === 'all' || drop.getAttribute('data-network') === filter) {
+                        drop.style.display = 'block';
+                    } else {
+                        drop.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // PumpFun Live Feed Logic
+        const feedGrid = document.getElementById('pump-feed-grid');
+        const wsUrl = 'wss://pumpportal.fun/api/data';
+        let socket;
+
+        function connectPumpFun() {
+            // If already connected, don't reconnect
+            if(socket && socket.readyState === WebSocket.OPEN) return;
+
+            socket = new WebSocket(wsUrl);
+
+            socket.onopen = function() {
+                console.log("Connected to PumpFun");
+                // Clear loading state only if it's the initial loader
+                if(feedGrid.querySelector('.fa-satellite-dish')) {
+                    feedGrid.innerHTML = '';
+                }
+                
+                // Subscribe to new tokens
+                const payload = { method: "subscribeNewToken" };
+                socket.send(JSON.stringify(payload));
+            };
+
+            socket.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    // Check if it's a new token creation
+                    // Note: PumpPortal sometimes sends different formats.
+                    // We look for 'txType' === 'create' or if it has 'mint' and 'initialBuy' which usually implies creation in this stream
+                    if (data.txType === 'create' || (data.mint && data.initialBuy !== undefined)) {
+                        addTokenCard(data);
+                    }
+                } catch (e) {
+                    console.error("Error parsing PumpFun data", e);
+                }
+            };
+
+            socket.onclose = function() {
+                console.log("Disconnected from PumpFun, reconnecting...");
+                setTimeout(connectPumpFun, 3000);
+            };
+
+            socket.onerror = function(err) {
+                console.error("PumpFun WS Error", err);
+                socket.close();
+            };
+        }
+
+        function addTokenCard(data) {
+            const name = data.name || "Unknown Token";
+            const symbol = data.symbol || "???";
+            const mint = data.mint;
+            const shortMint = mint ? (mint.substring(0, 4) + '...' + mint.substring(mint.length - 4)) : 'Unknown';
+            // Estimate Market Cap if provided or just show Initial Buy
+            let capDisplay = 'N/A';
+            if (data.marketCapSol) {
+                capDisplay = Math.round(data.marketCapSol) + ' SOL';
+            } else if (data.initialBuy) {
+                 // initialBuy is amount of tokens bought, not cap. 
+                 // We'll just show "New Launch"
+                 capDisplay = 'FRESH';
+            }
+
+            // Random rotation for sketchbook feel
+            const rot = (Math.random() * 4 - 2).toFixed(1);
+            
+            const card = document.createElement('div');
+            card.className = 'drop-card';
+            card.style.setProperty('--rotation', rot + 'deg');
+            card.style.animation = 'fadeIn 0.5s ease-out';
+            
+            // Build inner HTML structure
+            // 1. Header
+            let html = `
+                <div class="drop-header">
+                    <i class="fa-solid fa-pills network-icon" style="color: var(--marker-red);"></i>
+                    <span class="project-name" style="font-size: 1.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${name}</span>
+                </div>
+            `;
+
+            // 2. Image Container (We will populate the src via JS fetch)
+            const imgId = 'img-' + mint;
+            const placeholderId = 'ph-' + mint;
+            html += `
+                <div class="token-img-container">
+                    <div id="${placeholderId}" class="token-placeholder">
+                        <i class="fa-solid fa-question"></i>
+                    </div>
+                    <img id="${imgId}" class="token-img" style="display: none;" alt="${name}" />
+                </div>
+            `;
+
+            // 3. Details
+            html += `
+                <div class="detail-row">
+                    <span>Ticker:</span>
+                    <span class="highlight-gold" style="font-weight:bold;">$${symbol}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Mint:</span>
+                    <span style="font-family: var(--font-stats); font-size: 0.9rem;">${shortMint}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Cap:</span>
+                    <span class="status-active">${capDisplay}</span>
+                </div>
+                <a href="https://pump.fun/${mint}" target="_blank" class="btn-card" style="display:block; text-align:center; text-decoration:none;">SNIPE IT!</a>
+            `;
+            
+            card.innerHTML = html;
+            
+            // Prepend to grid
+            feedGrid.insertBefore(card, feedGrid.firstChild);
+            
+            // Fetch Image
+            if (data.uri) {
+                fetch(data.uri)
+                    .then(res => res.json())
+                    .then(meta => {
+                        if (meta.image) {
+                            const img = document.getElementById(imgId);
+                            const ph = document.getElementById(placeholderId);
+                            
+                            // Handle ipfs protocol if present
+                            let finalUrl = meta.image;
+                            if (finalUrl.startsWith('ipfs://')) {
+                                finalUrl = finalUrl.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
+                            }
+                            
+                            // If it's a relative path or other non-http, we might leave it or try to fix it
+                            // But usually it's a full URL
+                            
+                            img.src = finalUrl;
+                            img.onload = () => {
+                                img.style.display = 'block';
+                                ph.style.display = 'none';
+                            };
+                            img.onerror = () => {
+                                // Keep placeholder
+                                console.log("Failed to load image for", name);
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        // console.log("Metadata fetch failed", err);
+                    });
+            }
+            
+            // Keep only 6 items
+            if (feedGrid.children.length > 6) {
+                feedGrid.removeChild(feedGrid.lastChild);
+            }
+        }
+
+        // Start connection
+        connectPumpFun();
+
+
+        // Deploy Toast
+        function deployCrab(btn) {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            
+            // Scribble on button
+            const originalText = btn.innerText;
+            btn.innerText = "HUNTING...";
+            btn.style.textDecoration = "line-through";
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                btn.innerText = originalText;
+                btn.style.textDecoration = "none";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
