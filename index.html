@@ -15,8 +15,8 @@
         :root {
             --bg-paper: #F5F0E6;
             --pencil-gray: #2C2C2C;
-            --marker-red: #FF6B4A;
-            --highlighter-gold: #FFD700;
+            --marker-red: #c0392b; /* Pomegranate Red */
+            --highlighter-gold: #e67e22; /* Carrot Orange */
             --pencil-shade: #A5A5A5;
             --text-dark: #1A1A1A;
             
@@ -164,12 +164,12 @@
 
         /* Header */
         header {
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            background-color: rgba(245, 240, 230, 0.95);
-            z-index: 100;
-            border-bottom: 2px dashed var(--pencil-gray);
+            padding: 15px 5%;
+            border-bottom: 3px solid transparent; /* Hide but keep space */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: transparent; /* No background */
         }
 
         .header-content {
@@ -304,7 +304,6 @@
 
         .crab-fill {
             fill: var(--marker-red);
-            opacity: 0.1; /* Sketchy fill */
         }
 
         .crab-shading {
